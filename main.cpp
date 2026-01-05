@@ -8,6 +8,7 @@
 #include <sys/time.h>
 #include <netdb.h>
 
+#include "icmp/icmp.h"
 
 #define MAX_HOPS 64
 #define TIME_OUT 2
@@ -54,7 +55,20 @@ int main (int argc, char *argv[]) {
         setsockopt(sock, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl));
 
         // create icmp packet
+        ICMP* icmp = new ICMP();
+
+        icmp->type = 0x08;
+        icmp->code = 0x00;
+        icmp->un.echo.id = getpid();
+        icmp->un.echo.sequence = ttl;
+        icmp->payload.fill(0xAA);
+
+        auto sendbf = icmp->build();
+
+        icmp->checksum = icmp->icmpChecksum(reinterpret_cast<const u_int16_t *>(sendbf.data()), sendbf.size());
         
+
+
     }
 
 
