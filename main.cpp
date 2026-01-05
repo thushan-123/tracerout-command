@@ -63,7 +63,7 @@ int main(int argc, char* argv[]) {
 
         //send UDP packet
         sendto(udp_sock, "", 0, 0, (sockaddr*)&dest, sizeof(dest));
-        close(udp_sock);  // No need to keep it open
+        close(udp_sock);  
 
         // Receive ICMP reply
         char recvbuf[1024];
