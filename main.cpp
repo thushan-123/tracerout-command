@@ -21,6 +21,8 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
+    std::cout << "Traceroute command clone - Developed by Thush \n" << std::endl;
+
     //resolve host
     hostent* host = gethostbyname(argv[1]);
     if (!host) {
