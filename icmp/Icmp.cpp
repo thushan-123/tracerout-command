@@ -86,20 +86,18 @@ u_int16_t ICMP::icmpChecksum (const u_int16_t* data , size_t length) {
 
     // sum 16 bits
     while (length > 1) {
-        sum += (data[0] << 8) | data[1];
-        data += 2;
-        length -= 2;
+        sum += *data++;
+        length -=2;
     }
 
-    if (length == 1){
-        sum +=(data[0] << 8);
+    if(length == 1){
+        sum += *(reinterpret_cast<const uint8_t*>(data)) << 8;
     }
-
-    while (sum >> 16) {
+    while (sum >> 16){
         sum = (sum & 0xFFFF) + (sum >> 16);
     }
 
-    return static_cast<u_int16_t>(~sum);
+    return ~sum;
 }
 
 

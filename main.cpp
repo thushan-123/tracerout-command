@@ -66,7 +66,11 @@ int main (int argc, char *argv[]) {
         auto sendbf = icmp->build();
 
         icmp->checksum = icmp->icmpChecksum(reinterpret_cast<const u_int16_t *>(sendbf.data()), sendbf.size());
-        
+
+        auto start = std::chrono::high_resolution_clock::now();
+
+       // sendto(sock, sendbf, sizeof)
+
 
 
     }
