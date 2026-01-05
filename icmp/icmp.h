@@ -23,7 +23,7 @@ public:
     u_int16_t icmpChecksum(const u_int16_t *data, size_t length);
 
     
-    std::array<std::byte, 64> build() const;
+    std::array<uint8_t, 64> build() const;
 
     
 };

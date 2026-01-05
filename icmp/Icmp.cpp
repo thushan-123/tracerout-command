@@ -101,7 +101,7 @@ u_int16_t ICMP::icmpChecksum (const u_int16_t* data , size_t length) {
 }
 
 
-std::array<std::byte , 64> ICMP::build () const {
+std::array<uint8_t , 64> ICMP::build () const {
 
     std::array<uint8_t, 64> packet{};
     size_t k = 0;
@@ -124,4 +124,6 @@ std::array<std::byte , 64> ICMP::build () const {
     for (auto b : payload) {
         packet[k++] = b;
     }
+
+    return packet;
 }

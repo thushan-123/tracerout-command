@@ -17,7 +17,7 @@ int main (int argc, char *argv[]) {
 
     // check argument count
     if ( argc != 2 ){
-        std::cout<< "usage " << argv[0] << " host " << std::endl;
+        std::cout<< "usage " << argv[0] << " < host > " << std::endl;
         return 1;
     }
 
@@ -39,7 +39,7 @@ int main (int argc, char *argv[]) {
     std::cout << "Traceroute to " << argv[1] << "(" << target_ip << ") " << "64 max hops" <<std::endl;
     std::cout << std::endl;
 
-    int sock = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMP);
+    int sock = socket(AF_INET, SOCK_RAW, IPPROTO_ICMP);
     if (sock < 0){
         std::cout<< "socket ERROR" << std::endl;
         return 1;
