@@ -15,6 +15,30 @@ class ICMP {
         // std::array<std::byte, 64>   build () {
         //     return type + code + checksum + identifier[:2]+ payload[:56]
         // }
+
+        u_int16_t icmpChecksum (const u_int16_t* data , size_t length) {
+
+            u_int16_t sum = 0;
+
+            // sum 16 bits
+            while (length > 1) {
+                sum += (data[0] << 8) | data[1];
+                data += 2;
+                length -= 2;
+            }
+
+            if (length == 1){
+                sum +=(data[0] << 8);
+            }
+
+            while (sum >> 16) {
+                sum = (sum & 0xFFFF) + (sum >> 16);
+            }
+
+            return static_cast<u_int16_t>(~sum);
+        }
+
+
         std::array<std::byte , 64> build () const {
 
             std::array<std::byte, 64> packet{};
