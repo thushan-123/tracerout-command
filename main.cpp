@@ -4,9 +4,11 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netinet/ip.h>
+#include <netinet/ip_icmp.h>
 #include <sys/socket.h>
 #include <sys/time.h>
 #include <netdb.h>
+#include <chrono>
 
 #include "icmp/icmp.h"
 
@@ -55,26 +57,58 @@ int main (int argc, char *argv[]) {
         setsockopt(sock, IPPROTO_IP, IP_TTL, &ttl, sizeof(ttl));
 
         // create icmp packet
-        ICMP* icmp = new ICMP();
+        ICMP icmp{};
 
-        icmp->type = 0x08;
-        icmp->code = 0x00;
-        icmp->un.echo.id = getpid();
-        icmp->un.echo.sequence = ttl;
-        icmp->payload.fill(0xAA);
+        icmp.type = 0x08;
+        icmp.code = 0x00;
+        icmp.un.echo.id = getpid();
+        icmp.un.echo.sequence = ttl;
+        icmp.payload.fill(0xAA);
+        icmp.checksum = 0;
 
-        auto sendbf = icmp->build();
+        auto packet = icmp.build();
 
-        icmp->checksum = icmp->icmpChecksum(reinterpret_cast<const u_int16_t *>(sendbf.data()), sendbf.size());
+        icmp.checksum = icmp.icmpChecksum(reinterpret_cast<const u_int16_t *>(packet.data()), packet.size());
+
+        packet = icmp.build();
 
         auto start = std::chrono::high_resolution_clock::now();
 
-       // sendto(sock, sendbf, sizeof)
+        sendto(sock, packet.data() , packet.size(), 0, (sockaddr * ) &dest, sizeof(dest));
+
+        char recvbuffer[1024];
+        sockaddr_in reply{};
+        socklen_t len = sizeof(reply);
+
+        int n = recvfrom(sock , recvbuffer, sizeof(recvbuffer), 0, (sockaddr*)&reply , &len);
+
+        auto end = std::chrono::high_resolution_clock::now();
+
+        if (n < 0) {
+            std::cout << ttl << "  *\n";
+            continue;
+        }
+
+        auto rtt = std::chrono::duration<double, std::milli>(end - start).count();
+
+        char hop_ip[INET_ADDRSTRLEN];
+        inet_ntop(AF_INET, &reply.sin_addr, hop_ip, sizeof(hop_ip));
+
+        std::cout << ttl << "  " << hop_ip
+                  << "  " << rtt << " ms\n";
+
+        struct ip *ip_hdr = (struct ip*)recvbuffer;
+        int ip_header_len = ip_hdr->ip_hl * 4;
+
+        struct icmp *icmp_hdr = (struct icmp *)(recvbuffer + ip_header_len);
+        if (icmp_hdr->icmp_type == ICMP_ECHOREPLY) {
+            break;
+        }
 
 
 
     }
-
+    close(sock);
 
     return 0;
 
