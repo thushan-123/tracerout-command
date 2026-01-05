@@ -29,6 +29,10 @@ int main (int argc, char *argv[]) {
 
     sockaddr_in socket{};
     socket.sin_family = AF_INET;
+    memcpy(&socket.sin_addr, host->h_addr, host->h_length);
+
+    char  target_ip[INET_ADDRSTRLEN];
+
 
 
 
