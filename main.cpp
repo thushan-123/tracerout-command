@@ -33,8 +33,10 @@ int main (int argc, char *argv[]) {
 
     char  target_ip[INET_ADDRSTRLEN];
 
+    inet_ntop(AF_INET, &socket.sin_addr, target_ip, sizeof(target_ip));
 
-
+    std::cout << "Traceroute to " << argv[1] << "(" << target_ip << ") " << "64 max hops" <<std::endl;
+    std::cout << std::endl;
 
     return 0;
 
